@@ -1,54 +1,44 @@
 #include <iostream>
-#include <vector>
-#include <cmath>
-#include <limits>
 #include <algorithm>
-
+#include <vector>
 using namespace std;
-
-// 집과 대피소 간의 거리 계산 함수
-int calculateDistance(int x1, int y1, int x2, int y2) {
-    return abs(x1 - x2) + abs(y1 - y2);
+int n, k;
+int x[50], y[50];
+int calc_dist(int i, int j, int k){
+    int res = 0;
+    for(int h=0; h<n; h++){
+        res = max(res, min(min(abs(x[i]-x[h])+abs(y[i]-y[h]), abs(x[j]-x[h])+abs(y[j]-y[h])), 
+                  abs(x[k]-x[h])+abs(y[k]-y[h])));
+    }
+    return res;
 }
 
-int main() {
-    int N, K;
-    cin >> N >> K;
-
-    vector<pair<int, int>> houses(N);
-    for (int i = 0; i < N; i++) {
-        cin >> houses[i].first >> houses[i].second;
+int main(){
+    int ans = 1e9;
+    cin >> n >> k;
+    for(int i=0; i<n; i++){
+        cin >> x[i] >> y[i];
     }
-
-    vector<int> comb(N, 0);
-    fill(comb.end() - K, comb.end(), 1);
-    int result = numeric_limits<int>::max();
-
-    // 모든 가능한 대피소 조합을 탐색
-    while (next_permutation(comb.begin(), comb.end()))
-    {
-        vector<int> shelters;
-        for (int i = 0; i < N; i++) {
-            if (comb[i] == 1) {
-                shelters.push_back(i);
+    if(k==1){
+        for(int i=0; i<n; i++){
+            ans = min(ans, calc_dist(i, i, i));
+        }
+    }
+    else if(k==2){
+        for(int i=0; i<n; i++){
+            for(int j=0; j<n; j++){
+                ans = min(ans, calc_dist(i, j, j));
             }
         }
-
-        int maxDist = 0;
-        // 모든 집에 대해 가장 가까운 대피소와의 거리 계산
-        for (int i = 0; i < N; i++) {
-            int minDist = numeric_limits<int>::max();
-            for (int s : shelters) {
-                int dist = calculateDistance(houses[i].first, houses[i].second, houses[s].first, houses[s].second);
-                minDist = min(minDist, dist);
-            }
-            maxDist = max(maxDist, minDist);
-        }
-
-        result = min(result, maxDist);
     }
-
-    cout << result << endl;
-
-    return 0;
+    else{
+        for(int i=0; i<n; i++){
+            for(int j=0; j<n; j++){
+                for(int k=0; k<n; k++){
+                    ans = min(ans, calc_dist(i, j, k));
+                }
+            }
+        }
+    }
+    cout << ans;
 }
